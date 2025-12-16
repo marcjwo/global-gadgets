@@ -5,6 +5,7 @@ import { join } from 'path';
 
 import { Database, DatabasePsv, SelectedFacets } from './database';
 import { Products, RawFacet } from './products';
+import visualizeRouter from './visualize';
 
 //
 // Create the express app
@@ -23,6 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(staticPath));
+app.use('/api/visualize', visualizeRouter);
 
 //
 // Helper to parse facets and AI filter text

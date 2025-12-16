@@ -57,6 +57,7 @@ export class ProductsComponent implements OnInit {
   productSearch: string = '';
   searchType: string = SearchType.TRADITIONAL_SQL; // Default search type
   loading: boolean = false;
+  searchDuration: number = 0;
   productsResponse$?: Observable<QueryResponse<Product>> = undefined;
   facetsResponse$?: Observable<FacetResponse> = undefined;
 
@@ -110,6 +111,11 @@ export class ProductsComponent implements OnInit {
 
       this.productsLoading = false; // Ensure loading spinner stops
       this.facetsLoading = false; // Ensure loading spinner stops
+
+    // UX Improvements: Clear input and reset duration
+    this.productSearch = '';
+    this.searchDuration = 0;
+
       this.cdr.detectChanges(); // Force UI update
 
   }
@@ -226,6 +232,10 @@ export class ProductsComponent implements OnInit {
     }
 
     // Assign the observables directly. The results component will subscribe.
+    const startTime = performance.now();
+    this.searchDuration = 0; // Reset duration
+    this.productsLoading = true; // Ensure loading flag is set
+
     this.productsResponse$ = productSearch$.pipe(
       catchError((err: any) => {
         this.error.showError('Unable to search products', err);
@@ -234,6 +244,7 @@ export class ProductsComponent implements OnInit {
       }),
       finalize(() => {
         this.productsLoading = false;
+        this.searchDuration = (performance.now() - startTime) / 1000;
         this.ApplicationRef.tick(); // May need manual tick depending on change detection
         this.cdr.detectChanges();
       })
@@ -256,17 +267,17 @@ export class ProductsComponent implements OnInit {
   getSuggestion() {
     switch (this.searchType) {
       case SearchType.TRADITIONAL_SQL:
-        return "Black belt";
+        return "Console";
       case SearchType.FULLTEXT:
-        return "Black belt";
+        return "Mobile phone";
       case SearchType.TEXT_EMBEDDINGS:
-        return "Handbag";
+        return "DSLR Camera";
       case SearchType.HYBRID:
-        return "Handbag";
-      case SearchType.IMAGE:
-        return "gs://pr-public-demo-data/alloydb-retail-demo/user_photos/3.png";
+        return "Accessories for gaming";
+      // case SearchType.IMAGE:
+      //   return "gs://pr-public-demo-data/alloydb-retail-demo/user_photos/3.png";
       case SearchType.NATURAL:
-        return "What are some popular purses my wife might like?";
+        return "What are popular action cams available?";
       case SearchType.FREEFORM:
         return "SELECT * FROM products LIMIT 5;";
       default:

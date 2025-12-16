@@ -16,16 +16,16 @@ git fetch
 #
 echo "Building and pushing the container"
 TAG_NAME=$(git describe --abbrev=0 --tags --always)
-IMAGE=$REGION-docker.pkg.dev/$PROJECT_ID/cymbalshops/cymbalshops:$TAG_NAME
+IMAGE=$REGION-docker.pkg.dev/$PROJECT_ID/global-gadgets-repo/global-gadgets-repo:$TAG_NAME
 
-docker build --rm -t "$IMAGE" .
-docker push "$IMAGE"
+sudo docker build --rm -t "$IMAGE" .
+sudo docker push "$IMAGE"
 
 #
 # Step 3: Deploy to Cloud Run
 #
 echo "Deploying to Cloud Run"
-gcloud beta run deploy cymbalshops \
+gcloud beta run deploy global-gadgets \
   --image="$IMAGE" \
   --execution-environment=gen2 \
   --cpu-boost \
@@ -35,4 +35,4 @@ gcloud beta run deploy cymbalshops \
   --region="$REGION" \
   --project="$PROJECT_ID" \
   --allow-unauthenticated \
-  --set-env-vars=PGHOST="$PGHOST",PGPORT="$PGPORT",PGDATABASE="$PGDATABASE",PGUSER="$PGUSER",PGPASSWORD="$PGPASSWORD",PROJECT_ID="$PROJECT_ID",REGION="$REGION"
+  --set-env-vars=PGHOST="$PGHOST",PGPORT="$PGPORT",PGDATABASE="$PGDATABASE",PGUSER="$PGUSER",PGPASSWORD="$PGPASSWORD",PROJECT_ID="$PROJECT_ID",REGION="$REGION",GOOGLE_API_KEY="$GOOGLE_API_KEY"

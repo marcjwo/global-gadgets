@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { marked } from 'marked';
 
 @Pipe({
   name: 'textToHtml',
@@ -10,12 +11,7 @@ export class TextToHtmlPipe implements PipeTransform {
     if (!value)
       return '';
     
-    // Handle line breaks first
-    value = value.replace(/\n/g, '<br />');
-
-    // Handle bold formatting with regular expressions
-    value = value.replace(/\*\*([^\*]+)\*\*/g, '<b>$1</b>');
-
-    return value;
+    // Use marked to parse markdown
+    return marked.parse(value) as string;
   }
 }

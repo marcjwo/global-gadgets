@@ -7,7 +7,7 @@ source ./env.sh
 # Create the Artifact Registry repository:
 #
 echo "Creating the Artifact Registry repository"
-gcloud artifacts repositories create cymbalshops \
+gcloud artifacts repositories create global-gadgets-repo \
   --repository-format=docker \
   --location="$REGION" \
   --project="$PROJECT_ID"

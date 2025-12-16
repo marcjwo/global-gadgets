@@ -1,28 +1,92 @@
 /* stylelint-disable */
 @use '@angular/material' as mat;
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
 // Ensure core styles are included once
 @include mat.core();
 
-// --- Define palettes based on logo colors ---
+// --- Define palettes based on Global Gadgets Brand Guide ---
 
-// Primary: Red from logo (using mat.$red-palette as base)
-// We adjust the default hue (e.g., 700) to better match the logo's intensity.
-$cymbal-primary: mat.define-palette(mat.$red-palette, 700);
+// Custom Primary Palette (Dark Blue #1A2B47)
+$global-gadgets-primary: (
+  50: #e4e8ed,
+  100: #bac5d1,
+  200: #8d9fb3,
+  300: #5f7994,
+  400: #3d5c7d,
+  500: #1a2b47,
+  // Primary Brand Color
+  600: #172640,
+  700: #132037,
+  800: #0f1a2f,
+  900: #081020,
+  A100: #5c8aff,
+  A200: #2963ff,
+  A400: #0040f5,
+  A700: #0039db,
+  contrast: (50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #ffffff,
+    A400: #ffffff,
+    A700: #ffffff,
+  )
+);
 
-// Accent: Orange from logo (using mat.$orange-palette as base)
-// Using an accent hue (e.g., A400 or A700) often works well for vibrancy.
-$cymbal-accent:  mat.define-palette(mat.$red-palette, 700);
+// Custom Accent Palette (Blue #34568B)
+$global-gadgets-accent: (
+  50: #e7ebf1,
+  100: #c2cddc,
+  200: #99acc5,
+  300: #708bad,
+  400: #52729c,
+  500: #34568b,
+  // Accent Brand Color
+  600: #2f4f83,
+  700: #284578,
+  800: #223c6e,
+  900: #172b5c,
+  A100: #a6c1ff,
+  A200: #739eff,
+  A400: #407bff,
+  A700: #266aff,
+  contrast: (50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #ffffff,
+    A700: #ffffff,
+  )
+);
 
-// Warn: Deep Purple/Maroon from logo (using mat.$purple-palette as base)
-// Using a dark shade (e.g., 700 or 800).
-// **Consider if this purple effectively conveys "warning" in your UI.**
-// Alternatively, revert to mat.$red-palette for a standard warning color:
-// $cymbal-warn: mat.define-palette(mat.$red-palette);
-$cymbal-warn:    mat.define-palette(mat.$red-palette, 800);
+$cymbal-primary: mat.define-palette($global-gadgets-primary);
+$cymbal-accent: mat.define-palette($global-gadgets-accent);
+
+// Warn: Keeping standard red for usability as brand guide has no error color
+$cymbal-warn: mat.define-palette(mat.$red-palette);
 
 // --- Theme creation ---
-// Using the new palettes defined above
 $cymbal-theme: mat.define-light-theme((
   color: (
     primary: $cymbal-primary,
@@ -30,7 +94,8 @@ $cymbal-theme: mat.define-light-theme((
     warn: $cymbal-warn,
   ),
   typography: mat.define-typography-config(
-    $subtitle-1: mat.define-typography-level($font-family: "DM Sans",
+                $font-family: "Google Sans, Roboto, sans-serif",
+                  $subtitle-1: mat.define-typography-level($font-family: "Google Sans",
     $font-weight: 400,
     $font-size: 1rem,
     $line-height: 1,

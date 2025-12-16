@@ -1,15 +1,17 @@
-<div>
+<div class="app-container">
     <mat-toolbar>
         @if(!isSmallScreen) {
             <div>
-                <a href="/products"><img src="/assets/cymbal_shops_large.png" alt="Cymbal Shops" class="toolbar-logo" /></a>
+                <a href="/products"><img src="/assets/Global_Gadgets_Logo-transparent.png" alt="Global Gadgets"
+                        class="toolbar-logo" /></a>
             </div>
         } @else {
             <div>
-                <a href="/products"><img src="/assets/cymbal_shops_small.png" alt="Cymbal Shops" class="small-toolbar-logo" /></a>
+                <a href="/products"><img src="/assets/Global_Gadgets_Logo-transparent.png" alt="Global Gadgets"
+                        class="small-toolbar-logo" /></a>
             </div>
         }
-        <div class="subtitle">St<i>y</i>leSearch</div>
+        <div class="subtitle">Global Gadgets</div>
         <mat-divider [vertical]="true"></mat-divider>
 
         <span class="toolbar-spacer"></span>
@@ -21,9 +23,22 @@
         <span class="toolbar-spacer"></span>
 
         <mat-divider [vertical]="true"></mat-divider>
-        <button mat-button (click)="openArchitectureDialog()"><span class="architecture">Architecture</span></button>
+        <button mat-raised-button color="primary" (click)="openArchitectureDialog()" style="margin-right: 8px;">
+            <span class="architecture">Architecture</span>
+        </button>
+        <button mat-button (click)="openKudosDialog()">
+            <span class="architecture">Kudos</span>
+        </button>
     </mat-toolbar>
-    <body>
+    <nav mat-tab-nav-bar [tabPanel]="tabPanel">
+        @for (link of navLinks; track link) {
+        <a mat-tab-link [routerLink]="link.path" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+            {{link.label}}
+        </a>
+        }
+    </nav>
+    <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+    <main class="main-content">
         <router-outlet></router-outlet>
-    </body>
+    </main>
 </div>

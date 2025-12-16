@@ -1,0 +1,105 @@
+Global Gadgets Brand Guide
+This brand guide outlines the core visual elements for the "Global Gadgets" identity,
+ensuring consistency across all applications, including your demo app.
+
+1. Logo
+The "Global Gadgets" logo features a dynamic, multi-layered square shape,
+symbolizing innovation and connectivity, paired with a clean, modern wordmark.
+Link to png files
+Clear Space
+Always maintain a minimum clear space around the logo. This space should be at least
+X, where X is the height of the 'G' in "Global". No other elements should intrude into
+this clear space.
+Minimum Size
+To ensure legibility, the logo should not be reproduced at a size where the wordmark
+is less than 0.5 inches (or 40 pixels) in height.
+
+2. Color Palette
+The primary colors for "Global Gadgets" are derived directly from the logo, featuring a
+spectrum of cool blues that convey trust, technology, and reliability.
+
+Color Name
+
+HEX Code
+
+Usage
+
+Primary Dark Blue
+
+#1A2B47
+
+Headings, primary text, core
+brand elements
+
+Accent Blue 1
+
+#34568B
+
+Strong accents, interactive
+elements
+
+Accent Blue 2
+
+#6D9BC3
+
+Secondary accents,
+background elements
+
+Accent Blue 3
+
+#A3CCE1
+
+Lighter accents, subtle
+backgrounds
+
+Light Blue
+
+#D0E6F0
+
+Backgrounds, subtle gradients
+
+White
+
+#FFFFFF
+
+Text on dark backgrounds,
+clear spaces
+
+Note: These HEX codes are an approximation derived from visual analysis of the
+provided logo and aim to accurately represent the brand's intended color scheme.
+
+3. Typography
+The official typeface for "Global Gadgets" is Google Sans. This modern, geometric
+sans-serif font ensures excellent readability and a contemporary feel, aligning with
+the brand's innovative image.
+Usage
+●​ Headings (H1, H2, H3): Google Sans Bold or Medium
+●​ Body Text: Google Sans Regular
+●​ Captions/Small Text: Google Sans Regular or Light
+
+Examples
+
+Global Gadgets (Google Sans Bold - H1)
+Innovation at Your Fingertips (Google Sans Medium - H2)
+Explore Our Products (Google Sans Regular - H3)
+This is the standard body text for Global Gadgets. It uses Google Sans Regular and is
+easy to read. (Google Sans Regular - Body)
+
+4. Imagery
+Imagery should be clean, modern, and high-quality, focusing on technology,
+connectivity, and user experience. Avoid overly busy or cluttered visuals. Prioritize
+images that feature sleek designs and a consistent blue-toned filter to harmonize with
+the brand colors.
+
+5. Tone of Voice
+The "Global Gadgets" tone of voice is:
+●​ Innovative: Emphasizing cutting-edge technology.
+
+●​ Reliable: Instilling trust and confidence.
+●​ User-friendly: Accessible and easy to understand.
+●​ Forward-thinking: Focusing on future possibilities.
+
+This brand guide provides the essential elements to maintain a consistent and strong
+"Global Gadgets" identity in your demo app and other brand communications.
+
+

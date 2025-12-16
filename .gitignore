@@ -46,3 +46,6 @@ Thumbs.db
 # Terraform
 .terraform*
 terraform.tfstate*
+
+# env
+/demo_app/env.sh

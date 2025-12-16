@@ -13,6 +13,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: BASE_URL,
       useValue: '/api'
+      // useValue: 'http://localhost:8080/api'
     },
     importProvidersFrom(HttpClientModule)
 

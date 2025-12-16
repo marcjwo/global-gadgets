@@ -1,6 +1,5 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as marked from 'marked'; 
 
 @Component({
@@ -12,22 +11,24 @@ import * as marked from 'marked';
   templateUrl: './markdown-viewer.component.html',
   styleUrl: './markdown-viewer.component.scss'
 })
-export class MarkdownViewerComponent {
+export class MarkdownViewerComponent implements OnChanges {
+  @Input() data: string | null = null;
   parsedHtml: string | Promise<string> = '';
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { markdownSource: string | Promise<string> }) {
-    fetch('assets/architecture.md')
-      .then(response => response.text())
-      .then(markdown => {
-        console.log(JSON.stringify(markdown, null, 2));
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
+      this.render();
+    }
+  }
 
-        // Parse the markdown string into HTML
-        this.parsedHtml = marked.parse(markdown); 
-      })
-      .catch(error => {
-        console.error('Error fetching or parsing Markdown:', error);
-        // Handle the error appropriately (e.g., display an error message)
-      });
+  private render() {
+    if (this.data) {
+      // Parse the markdown string into HTML
+      // marked.parse can return a Promise or string depending on options, 
+      // but strictly typing it as string | Promise<string> handles both.
+      this.parsedHtml = marked.parse(this.data);
+    } else {
+      this.parsedHtml = '';
+    }
   }
 }
-

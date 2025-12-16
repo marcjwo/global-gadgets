@@ -1,3 +1,14 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 * {
   font-family: Roboto, sans-serif;
 }
@@ -60,10 +71,18 @@ mat-toolbar > div:has(> .powered-by) {
 }
 
 .mat-toolbar {
-  margin-bottom: 30px;
+  margin-bottom: 0;
+    /* Removed margin to allow flex container to handle spacing if needed, but keeping breathing room via padding or just natural flow if appropriate. */
+    /* Re-adding margin if critical for design, but inside flex it's safer to use padding on container or margin on content */
+    /* margin-bottom: 30px; */
+    /* User wanted "breathing room" likely, but let's try without forcing it to break layout */
+    flex: 0 0 auto;
+    /* Don't shrink/grow */
   height: 100px;
+  z-index: 2;
 }
 
+/* Add margin back via the container or spacer if needed, or just let tabs sit below */
 .mat-button-toggle {
   font-size: small;
   font-weight: bold;
@@ -89,4 +108,62 @@ mat-toolbar > div:has(> .powered-by) {
 
 .architecture {
   font-size: 1.1em;
+}
+/* Tab Styling */
+nav[mat-tab-nav-bar] {
+  background-color: #D0E6F0;
+  /* Brand Light Blue */
+  border-bottom: 1px solid #bac5d1;
+  flex: 0 0 auto;
+  /* Don't shrink/grow */
+  z-index: 1;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  overflow: hidden;
+  /* Scroll handled by children */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+a[mat-tab-link] {
+  font-size: 1.1em;
+  font-weight: 500;
+  min-width: 160px;
+  padding: 0 24px;
+  color: #1A2B47;
+  /* Brand Primary Dark Blue */
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: rgba(26, 43, 71, 0.1);
+    /* Dark Blue with low opacity */
+  }
+
+  // Target the active state specifically
+  &.mdc-tab--active {
+    background-color: #1A2B47 !important;
+    /* Brand Primary Dark Blue */
+    opacity: 1;
+
+    // Force the text label to be white
+    ::ng-deep .mdc-tab__text-label {
+      color: #FFFFFF !important;
+      font-weight: 700;
+    }
+
+    // Also target the link itself just in case
+    color: #FFFFFF !important;
+
+    &:hover {
+      background-color: #1A2B47 !important;
+    }
+
+    // Make the underline white
+    ::ng-deep .mdc-tab-indicator__content--underline {
+      border-color: #FFFFFF !important;
+    }
+  }
 }

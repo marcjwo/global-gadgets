@@ -18,6 +18,7 @@ import { TextToHtmlPipe } from '../../common/text-to-html.pipe';
 import { SqlStatementComponent } from '../../common/sql-statement/sql-statement.component';
 import { SqlViewerDialogComponent } from '../sql-viewer-dialog/sql-viewer-dialog.component';
 import { RoleService } from '../../services/cymbalshops-api';
+import { VisualizeDialogComponent } from '../visualize/visualize-dialog.component';
 
 @Component({
   selector: 'app-product-results',
@@ -47,9 +48,15 @@ import { RoleService } from '../../services/cymbalshops-api';
 export class ProductResultsComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
-    private RoleService: RoleService,
-    public dialog: MatDialog
+    private dialog: MatDialog
   ) { }
+
+  openVisualizeDialog(product: Product): void {
+    this.dialog.open(VisualizeDialogComponent, {
+      data: { product },
+      width: '800px'
+    });
+  }
 
   // --- Inputs for loading states ---
   @Input() productsLoading: boolean = false;
@@ -173,9 +180,24 @@ export class ProductResultsComponent implements OnInit, OnDestroy {
   private processProductResponse(response: QueryResponse<Product>): QueryResponse<Product> {
     if (response.data && response.data.length > 0) {
       const modifiedData = response.data.map(product => {
-        let modifiedProduct = { ...product };
-        const stringToReplace = 'gs://pr-public-demo-data/';
-        const replacementString = 'https://storage.googleapis.com/pr-public-demo-data/';
+        let modifiedProduct = { ...product } as any; // Cast to any to access raw fields
+
+        // Map raw fields to expected interface fields
+        if (modifiedProduct.productname && !modifiedProduct.name) {
+          modifiedProduct.name = modifiedProduct.productname;
+        }
+        if (modifiedProduct.description && !modifiedProduct.productDescription) {
+          modifiedProduct.productDescription = modifiedProduct.description;
+        }
+        if (modifiedProduct.productid && !modifiedProduct.id) {
+          modifiedProduct.id = modifiedProduct.productid;
+        }
+        if (modifiedProduct.unitprice && !modifiedProduct.retailPrice) {
+          modifiedProduct.retailPrice = modifiedProduct.unitprice;
+        }
+
+        const stringToReplace = 'gs://dcopm-gg-images/';
+        const replacementString = 'https://storage.mtls.cloud.google.com/dcopm-gg-images/';
         if (modifiedProduct.productImageUri && typeof modifiedProduct.productImageUri === 'string') {
           modifiedProduct.productImageUri = modifiedProduct.productImageUri.replace(stringToReplace, replacementString);
         }
@@ -184,7 +206,7 @@ export class ProductResultsComponent implements OnInit, OnDestroy {
           const factor = Math.pow(10, decimalPlaces);
           modifiedProduct.rrfScore = Math.round(modifiedProduct.rrfScore * factor) / factor;
         }
-        return modifiedProduct;
+        return modifiedProduct as Product;
       });
       return { ...response, data: modifiedData };
     }
@@ -196,11 +218,18 @@ export class ProductResultsComponent implements OnInit, OnDestroy {
     const facetMap = new Map<string, Facet[]>();
 
     rawFacets.forEach(facet => {
-      const type = facet.facetType;
-      if (!facetMap.has(type)) {
-        facetMap.set(type, []);
+      // Defensive check for lowercase and snake_case fields
+      const facetAny = facet as any;
+      const type = facet.facetType || facetAny.facettype || facetAny.facet_type;
+      const value = facet.facetValue || facetAny.facetvalue || facetAny.facet_value;
+      const count = facet.count || facetAny.count;
+
+      if (type && value) {
+        if (!facetMap.has(type)) {
+          facetMap.set(type, []);
+        }
+        facetMap.get(type)?.push({ value: value, count: count });
       }
-      facetMap.get(type)?.push({ value: facet.facetValue, count: facet.count });
     });
 
     // Convert map to array for the template, maintaining desired order
@@ -253,6 +282,17 @@ export class ProductResultsComponent implements OnInit, OnDestroy {
     }
 
     // --- Emit the updated selection object ---
+    this.facetSelectionChange.emit(this.selectedFacets);
+  }
+
+  // Check if any facets are currently selected
+  hasSelectedFacets(): boolean {
+    return Object.keys(this.selectedFacets).length > 0;
+  }
+
+  // Clear all selected facets
+  clearSelectedFacets(): void {
+    this.selectedFacets = {};
     this.facetSelectionChange.emit(this.selectedFacets);
   }
 

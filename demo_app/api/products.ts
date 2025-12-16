@@ -22,11 +22,11 @@ function buildPriceRangeCondition(priceRanges: string[] | undefined): string {
 
     const conditions = priceRanges.map(range => {
         switch (range) {
-            case '$0 - $49.99': return "(p.retail_price >= 0 AND p.retail_price < 50)";
-            case '$50 - $99.99': return "(p.retail_price >= 50 AND p.retail_price < 100)";
-            case '$100 - $249.99': return "(p.retail_price >= 100 AND p.retail_price < 250)";
-            case '$250 - $499.99': return "(p.retail_price >= 250 AND p.retail_price < 500)";
-            case '$500+': return "(p.retail_price >= 500)";
+            case '$0 - $49.99': return "(p.unitprice >= 0 AND p.unitprice < 50)";
+            case '$50 - $99.99': return "(p.unitprice >= 50 AND p.unitprice < 100)";
+            case '$100 - $249.99': return "(p.unitprice >= 100 AND p.unitprice < 250)";
+            case '$250 - $499.99': return "(p.unitprice >= 250 AND p.unitprice < 500)";
+            case '$500+': return "(p.unitprice >= 500)";
             default:
                 console.warn(`Unknown price range facet value: ${range}`);
                 return "FALSE"; // Or handle unknown ranges differently
@@ -106,11 +106,11 @@ function buildFacetCandidateSql(searchTerm: string, searchType: string, facetWhe
         case 'textEmbeddings':
             candidateSql += `
             WITH vs AS (
-                    SELECT id, product_embedding <=> embedding('gemini-embedding-001', '${safeSearchTerm}')::vector AS distance
-                    FROM products p
+                    SELECT productid, product_embedding <=> embedding('gemini-embedding-001', '${safeSearchTerm}')::vector AS distance
+                    FROM d_products p
                     WHERE 1=1 ${facetWhereClause}
                     ORDER BY distance LIMIT 500
-                ) SELECT id FROM vs WHERE distance < 0.5
+                ) SELECT productid FROM vs WHERE distance < 0.5
             )
             `;
             break;
@@ -123,31 +123,31 @@ function buildFacetCandidateSql(searchTerm: string, searchType: string, facetWhe
                   image => '${searchTerm}', 
                   mimetype => 'image/png'
               )::vector AS embedding
-            ), distance_result AS (SELECT  p.id,
+            ), distance_result AS (SELECT  p.productid,
                     p.product_image_embedding <=>  image_embedding.embedding AS distance
-                FROM products p, image_embedding
+                FROM d_products p, image_embedding
                 WHERE p.product_image_embedding IS NOT NULL 
                 ORDER BY distance
                 LIMIT 500 
-            ) SELECT id FROM distance_result WHERE distance < 0.6
+            ) SELECT productid FROM distance_result WHERE distance < 0.6
             )
             `;
             break;
         case 'fulltext':
             candidateSql += `
-                SELECT id FROM products WHERE fts_document @@ websearch_to_tsquery('english', '${safeSearchTerm}')
+                SELECT productid FROM d_products WHERE fts_document @@ websearch_to_tsquery('english', '${safeSearchTerm}')
             )
             `;
             break;
         case 'traditionalSql':
             let formattedSearchTerm = searchTerm.replace(/\s+/g, ' ').split(' ').join('%')
             candidateSql += `
-                SELECT id FROM products WHERE name ILIKE '%${safeString(formattedSearchTerm)}%'
+                SELECT productid FROM d_products WHERE productname ILIKE '%${safeString(formattedSearchTerm)}%'
                  OR sku ILIKE '%${safeString(formattedSearchTerm)}%'
                  OR category ILIKE '%${safeString(formattedSearchTerm)}%'
                  OR brand ILIKE '%${safeString(formattedSearchTerm)}%'
                  OR department ILIKE '%${safeString(formattedSearchTerm)}%'
-                 OR product_description ILIKE '%${safeString(formattedSearchTerm)}%'
+                 OR description ILIKE '%${safeString(formattedSearchTerm)}%'
                  )
             `;
             break;
@@ -158,19 +158,19 @@ function buildFacetCandidateSql(searchTerm: string, searchType: string, facetWhe
                 ),
                 vector_candidates AS (
                     SELECT
-                        p.id,
+                        p.productid,
                         p.product_embedding <=> e.query_embedding AS distance
-                    FROM products p, e
+                    FROM d_products p, e
                     WHERE p.product_embedding <=> e.query_embedding < 0.5
                     ${facetWhereClause}
                     ORDER BY distance
                     LIMIT 500
                 )
-                SELECT id FROM vector_candidates
+                SELECT productid FROM vector_candidates
                 UNION
-                SELECT id FROM products WHERE sku = '${safeSearchTerm}'
+                SELECT productid FROM d_products WHERE sku = '${safeSearchTerm}'
                 UNION
-                SELECT id FROM products WHERE fts_document @@ websearch_to_tsquery('english', '${safeSearchTerm}')
+                SELECT productid FROM d_products WHERE fts_document @@ websearch_to_tsquery('english', '${safeSearchTerm}')
             )
             `;
             break;
@@ -200,21 +200,21 @@ export class Products {
               -- 2. Filter products based on BOTH candidates AND selected facets
               products_for_faceting AS (
                 SELECT
-                  p.id,
-                  p.name,
-                  p.product_description,
+                  p.productid,
+                  p.productname,
+                  p.description,
                   p.department,
                   p.brand,
                   p.category,
-                  p.retail_price
+                  p.unitprice
                 FROM
-                  products AS p
-                  JOIN candidate_ids AS c ON p.id = c.id
+                  d_products AS p
+                  JOIN candidate_ids AS c ON p.productid = c.productid
                 WHERE 1=1 ${facetWhereClause} 
               ),
               -- 3. Calculate the total count of items matching facet criteria
               facet_total_count AS (
-                  SELECT COUNT(DISTINCT id) as total_facet_items FROM products_for_faceting
+                  SELECT COUNT(DISTINCT productid) as total_facet_items FROM products_for_faceting
               ),
               -- 4. Create price range bins AFTER filtering
               products_with_price_range AS (
@@ -222,14 +222,14 @@ export class Products {
                       pff.brand,
                       pff.category,
                       CASE
-                        WHEN pff.retail_price < 50 THEN '$0 - $49.99'
-                        WHEN pff.retail_price >= 50 AND pff.retail_price < 100 THEN '$50 - $99.99'
-                        WHEN pff.retail_price >= 100 AND pff.retail_price < 250 THEN '$100 - $249.99'
-                        WHEN pff.retail_price >= 250 AND pff.retail_price < 500 THEN '$250 - $499.99'
-                        WHEN pff.retail_price >= 500 THEN '$500+'
+                        WHEN pff.unitprice < 50 THEN '$0 - $49.99'
+                        WHEN pff.unitprice >= 50 AND pff.unitprice < 100 THEN '$50 - $99.99'
+                        WHEN pff.unitprice >= 100 AND pff.unitprice < 250 THEN '$100 - $249.99'
+                        WHEN pff.unitprice >= 250 AND pff.unitprice < 500 THEN '$250 - $499.99'
+                        WHEN pff.unitprice >= 500 THEN '$500+'
                         ELSE NULL
                       END AS price_range,
-                      pff.retail_price -- Keep for ordering price ranges
+                      pff.unitprice -- Keep for ordering price ranges
                  FROM products_for_faceting pff
               ),
               -- 5. Calculate Aggregations using GROUPING SETS on the filtered set
@@ -242,7 +242,7 @@ export class Products {
                     WHEN GROUPING(price_range) = 0 THEN 'price_range'
                   END AS facet_type,
                   COUNT(*) AS count,
-                  MIN(retail_price) as min_price_for_ordering
+                  MIN(unitprice) as min_price_for_ordering
                 FROM
                   products_with_price_range -- Use the filtered data WITH price ranges
                 WHERE
@@ -313,12 +313,12 @@ export class Products {
             finalQuery = `WITH pre_filtered_results AS (` + finalQuery +  `)
                           SELECT * FROM pre_filtered_results
                           WHERE ai.if(prompt => 'The following product ${safeAiFilter}: ' || 
-                                ' Product name: ' || COALESCE(name, '') ||
+                                ' Product name: ' || COALESCE(productname, '') ||
                                 ' Brand: ' || COALESCE(brand, '') ||
                                 ' Category: ' || COALESCE(category, '') ||
                                 ' Department: ' || COALESCE(department, '') ||
-                                ' Price: ' || COALESCE(retail_price, '') || 
-                                ' Description: ' || COALESCE(product_description, ''))`
+                                ' Price: ' || COALESCE(unitprice, '') || 
+                                ' Description: ' || COALESCE(description, ''))`
         }
         
 
@@ -365,19 +365,19 @@ export class Products {
         // Base query - use 'p' alias for products table
         let query = `
             SELECT
-                p.name, p.product_image_uri, p.brand, p.product_description,
-                p.category, p.department, p.cost, p.retail_price::MONEY, p.sku,
+                p.productname, p.product_image_uri, p.brand, p.description,
+                p.category, p.department, p.cost, p.unitprice::MONEY, p.sku,
                 'SQL' AS retrieval_method,
                 COUNT(*) OVER () AS total_count
-            FROM products p
-            WHERE (name ILIKE '%${safeString(formattedSearchTerm)}%'
+            FROM d_products p
+            WHERE (productname ILIKE '%${safeString(formattedSearchTerm)}%'
                 OR sku ILIKE '%${safeString(formattedSearchTerm)}%'
                 OR category ILIKE '%${safeString(formattedSearchTerm)}%'
                 OR brand ILIKE '%${safeString(formattedSearchTerm)}%'
                 OR department ILIKE '%${safeString(formattedSearchTerm)}%'
-                OR product_description ILIKE '%${safeString(formattedSearchTerm)}%')
+                OR description ILIKE '%${safeString(formattedSearchTerm)}%')
             ${facetWhereClause}
-            ORDER BY name
+            ORDER BY productname
             LIMIT 12`; // Consider if LIMIT should be applied before or after faceting
         
         // Note: This specific query uses ILIKE, making direct parameterization difficult.
@@ -398,11 +398,11 @@ export class Products {
         let query = `
             SELECT
                 ts_rank(p.fts_document, ${ftsQuery}) AS fts_rank_score,
-                p.name, p.product_image_uri, p.brand, p.product_description,
-                p.category, p.department, p.cost, p.retail_price::MONEY, p.sku,
+                p.productname, p.product_image_uri, p.brand, p.description,
+                p.category, p.department, p.cost, p.unitprice::MONEY, p.sku,
                 'FTS' AS retrieval_method,
                 COUNT(*) OVER () AS total_count
-            FROM products p
+            FROM d_products p
             WHERE p.fts_document @@ ${ftsQuery}
             ${facetWhereClause}
             ORDER BY fts_rank_score DESC
@@ -424,9 +424,9 @@ export class Products {
             ),
             vector_search AS (
                 SELECT
-                    p.id,
+                    p.productid,
                     p.product_embedding <=> e.query_embedding AS distance
-                FROM products p, e
+                FROM d_products p, e
                 WHERE p.product_embedding <=> e.query_embedding < 0.5
                 ${facetWhereClause}
                 ORDER BY distance
@@ -434,11 +434,11 @@ export class Products {
             )
             SELECT
                 vs.distance,
-                p.name, p.product_image_uri, p.brand, p.product_description,
-                p.category, p.department, p.cost, p.retail_price::MONEY, p.sku,
+                p.productname, p.product_image_uri, p.brand, p.description,
+                p.category, p.department, p.cost, p.unitprice::MONEY, p.sku,
                 'VECTOR' AS retrieval_method
             FROM vector_search vs
-            JOIN products p ON vs.id = p.id
+            JOIN d_products p ON vs.productid = p.productid
             ORDER BY vs.distance
             LIMIT 24`;
 
@@ -460,26 +460,26 @@ export class Products {
         // Use placeholders in the query string and pass values via params array
         let query = `
             WITH trad_sql AS (
-                SELECT RANK() OVER (ORDER BY name) AS trad_sql_rank, id FROM products WHERE sku = $${facetParams.length + 1} ORDER BY name
+                SELECT RANK() OVER (ORDER BY productname) AS trad_sql_rank, productid FROM d_products WHERE sku = $${facetParams.length + 1} ORDER BY productname
             ), fts_search AS (
-                SELECT ts_rank(fts_document, websearch_to_tsquery('english', $${facetParams.length + 2})) AS score, RANK() OVER (ORDER BY ts_rank(fts_document, websearch_to_tsquery('english', $${facetParams.length + 2})) DESC) as rank, id
-                FROM products WHERE fts_document @@ websearch_to_tsquery('english', $${facetParams.length + 2}) ORDER BY score DESC
+                SELECT ts_rank(fts_document, websearch_to_tsquery('english', $${facetParams.length + 2})) AS score, RANK() OVER (ORDER BY ts_rank(fts_document, websearch_to_tsquery('english', $${facetParams.length + 2})) DESC) as rank, productid
+                FROM d_products WHERE fts_document @@ websearch_to_tsquery('english', $${facetParams.length + 2}) ORDER BY score DESC
             ), vector_search AS (
                 WITH e AS (
                     SELECT embedding ('gemini-embedding-001', $${facetParams.length + 3})::vector AS query_embedding
                 ),
                 vs AS (
                     SELECT
-                        p.id,
+                        p.productid,
                         p.product_embedding <=> e.query_embedding AS distance
-                    FROM products p, e
+                    FROM d_products p, e
                     WHERE p.product_embedding <=> e.query_embedding < 0.5
                     ${facetWhereClause}
                     ORDER BY distance
                     LIMIT 50
                 )
                 SELECT
-                    vs.id,
+                    vs.productid,
                     vs.distance,
                     RANK() OVER (ORDER BY distance) AS rank
                 FROM vs
@@ -487,7 +487,7 @@ export class Products {
             -- Combine and rank
             combined_results AS (
                  SELECT
-                    p.id, p.name, p.product_image_uri, p.brand, p.product_description, p.category, p.department, p.cost, p.retail_price, p.sku,
+                    p.productid, p.productname, p.product_image_uri, p.brand, p.description, p.category, p.department, p.cost, p.unitprice, p.sku,
                     GREATEST( -- Boost SKU matches and vector search results
                       COALESCE( (1.0 / (${rrfK - 5} + vector_search.rank)), 0.0 ), 
                       COALESCE( (1.0 / (${rrfK} + fts_search.rank)), 0.0 ),
@@ -499,15 +499,15 @@ export class Products {
                         CASE WHEN trad_sql.trad_sql_rank IS NOT NULL THEN 'SQL' ELSE NULL END
                     ) AS retrieval_method,
                     COUNT(*) OVER () as total_count
-                FROM products p
-                LEFT JOIN vector_search ON p.id = vector_search.id
-                LEFT JOIN fts_search ON p.id = fts_search.id
-                LEFT JOIN trad_sql ON p.id = trad_sql.id
-                WHERE (vector_search.id IS NOT NULL OR fts_search.id IS NOT NULL OR trad_sql.id IS NOT NULL)
+                FROM d_products p
+                LEFT JOIN vector_search ON p.productid = vector_search.productid
+                LEFT JOIN fts_search ON p.productid = fts_search.productid
+                LEFT JOIN trad_sql ON p.productid = trad_sql.productid
+                WHERE (vector_search.productid IS NOT NULL OR fts_search.productid IS NOT NULL OR trad_sql.productid IS NOT NULL)
                 ${facetWhereClause}
             )
             -- Final Selection
-            SELECT id, name, product_image_uri, brand, product_description, category, department, cost, retail_price::MONEY, sku, rrf_score, retrieval_method, total_count
+            SELECT productid, productname, product_image_uri, brand, description, category, department, cost, unitprice::MONEY, sku, rrf_score, retrieval_method, total_count
             FROM combined_results
             ORDER BY rrf_score DESC
             LIMIT ${limit}
@@ -542,9 +542,9 @@ export class Products {
                 ), multimodal_candidates AS (
                     -- Find initial candidates based purely on image similarity
                     SELECT
-                        p.id,
+                        p.productid,
                         (p.product_image_embedding <=> ie.embedding) AS distance
-                    FROM products p, image_embedding ie
+                    FROM d_products p, image_embedding ie
                     WHERE p.product_image_embedding IS NOT NULL 
                     ORDER BY distance
                     LIMIT 500 
@@ -552,10 +552,10 @@ export class Products {
                 -- Join candidates with product details and apply facet filters
                 filtered_candidates AS (
                      SELECT
-                        mc.id,
+                        mc.productid,
                         mc.distance
                     FROM multimodal_candidates mc
-                    JOIN products p ON mc.id = p.id 
+                    JOIN d_products p ON mc.productid = p.productid 
                     WHERE distance < 0.6
                     ${facetWhereClause}
                     -- Parameters for facets will be passed to the final execution
@@ -563,11 +563,11 @@ export class Products {
                 -- Final selection and ranking
                 SELECT
                     RANK () OVER (ORDER BY fc.distance) AS vector_rank,
-                    p.id, p.name, p.product_image_uri, p.brand, p.product_description,
-                    p.category, p.department, p.cost, p.retail_price::MONEY, p.sku,
+                    p.productid, p.productname, p.product_image_uri, p.brand, p.description,
+                    p.category, p.department, p.cost, p.unitprice::MONEY, p.sku,
                     'IMAGE' as retrieval_method, COUNT(*) OVER () as total_count
                 FROM filtered_candidates fc
-                JOIN products p ON fc.id = p.id
+                JOIN d_products p ON fc.productid = p.productid
                 ORDER BY fc.distance 
                 LIMIT ${limit}`; 
 

@@ -7,6 +7,7 @@ import { BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { ProductsComponent } from './products/products.component';
 import { SnackBarErrorComponent } from './common/SnackBarErrorComponent';
@@ -24,6 +25,7 @@ import { MarkdownViewerComponent } from './common/markdown-viewer/markdown-viewe
 import { HttpClient } from '@angular/common/http';
 
 import { ArchitectureComponent } from './architecture/architecture.component';
+import { KudosComponent } from './kudos/kudos.component';
 
 @Component({
   selector: 'app-root',
@@ -35,13 +37,16 @@ import { ArchitectureComponent } from './architecture/architecture.component';
     MatButtonModule,
     MatToolbarModule,
     MatIconModule,
+    MatTabsModule,
     ProductsComponent,
     MatButtonToggleModule, 
     MatCheckboxModule,
     MatDividerModule,
     MatMenuModule,
     MarkdownViewerComponent,
+    MarkdownViewerComponent,
     ArchitectureComponent,
+    KudosComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -56,6 +61,12 @@ export class AppComponent implements OnInit {
 
   isSmallScreen: boolean = false;
 
+  navLinks = [
+    { path: '/products', label: 'Product Search' },
+    { path: '/insights', label: 'Operational and Analytical Insights' },
+    { path: '/agent-lounge', label: 'Agent Lounge 🩻' }
+  ];
+
   markdownContent = '';
 
   ngOnInit() { 
@@ -68,6 +79,12 @@ export class AppComponent implements OnInit {
     this.dialog.open(ArchitectureComponent, { 
       height: '90%',
       width: '90%'
+    });
+  }
+
+  openKudosDialog() {
+    this.dialog.open(KudosComponent, {
+      width: '400px'
     });
   }
 

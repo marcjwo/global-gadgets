@@ -2,12 +2,16 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Import CommonModule for *ngFor
 import { MatTableModule } from '@angular/material/table'; // Import MatTableModule
 import { MatCardModule } from '@angular/material/card'; // Optional: for wrapping
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 // Interface for structuring the data
 export interface SearchMethodComparison {
   methodName: string;
   strengths: string[];
   weaknesses: string[];
+  sampleQuery?: string;
 }
 
 @Component({
@@ -16,10 +20,19 @@ export interface SearchMethodComparison {
   imports: [
     CommonModule, // Needed for *ngFor
     MatTableModule, // <-- Import the Angular Material Table module
-    MatCardModule   // <-- Optional card wrapper
+    MatCardModule,   // <-- Optional card wrapper
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './architecture.component.html',
-  styleUrls: ['./architecture.component.scss']
+  styleUrls: ['./architecture.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class ArchitectureComponent {
   // Data for the table
@@ -38,7 +51,12 @@ export class ArchitectureComponent {
         '`ILIKE \'%term%\'` queries are slow and don\'t scale well.', // Escaped quote
         'Struggles with matching within long descriptions or multiple fields effectively.',
         'Requires users to know specific terms.'
-      ]
+      ],
+      sampleQuery: `SELECT product_name, sku, price
+FROM products_table
+WHERE product_name ILIKE '%search_term%'
+   OR description ILIKE '%search_term%'
+   AND price < 100;`
     },
     {
       methodName: 'Full-Text Search',
@@ -55,7 +73,12 @@ export class ArchitectureComponent {
         'Struggles with complex synonyms or conceptual relationships unless explicitly configured.',
         'Does not handle natural language queries well.',
         'May return irrelevant results if keywords appear out of context.'
-      ]
+      ],
+      sampleQuery: `SELECT product_name, ts_rank(search_vector, query) as rank
+FROM products_table, 
+     websearch_to_tsquery('english', 'search_term') query
+WHERE search_vector @@ query
+ORDER BY rank DESC;`
     },
     {
       methodName: 'Text Embeddings',
@@ -70,7 +93,16 @@ export class ArchitectureComponent {
         'Requires generating embeddings (ML model inference - compute cost).',
         'Needs specialized vector database or index (e.g., using ANN algorithms like ScaNN, HNSW) for efficient search at scale.',
         'Can sometimes return results that are *too* broad or conceptually related but functionally wrong.'
-      ]
+      ],
+      sampleQuery: `WITH query_embedding AS (
+  SELECT embedding('model_id', 'search_term')::vector AS vector
+)
+SELECT product_name, 
+       (product_embedding <=> vector) as distance
+FROM products_table, query_embedding
+WHERE (product_embedding <=> vector) < 0.5
+ORDER BY distance ASC
+LIMIT 10;`
     },
      {
       methodName: 'Hybrid Search',
@@ -86,7 +118,25 @@ export class ArchitectureComponent {
         'Higher infrastructure costs and operational overhead.',
         'Requires careful tuning of the result merging/ranking strategy (e.g., weights, fusion algorithm).',
         'Potential for slightly increased query latency if not optimized well.'
-      ]
+       ],
+       sampleQuery: `WITH vector_results AS (
+  -- Semantic Search
+  SELECT id, RANK() OVER (ORDER BY distance) as v_rank 
+  FROM vector_search_subquery
+),
+keyword_results AS (
+  -- Keyword Search
+  SELECT id, RANK() OVER (ORDER BY ts_rank) as k_rank 
+  FROM keyword_search_subquery
+)
+SELECT p.product_name,
+       -- Reciprocal Rank Fusion
+       (1.0 / (60 + COALESCE(v.v_rank, 0)) + 
+        1.0 / (60 + COALESCE(k.k_rank, 0))) as rrf_score
+FROM products_table p
+LEFT JOIN vector_results v ON p.id = v.id
+LEFT JOIN keyword_results k ON p.id = k.id
+ORDER BY rrf_score DESC;`
     },
      {
       methodName: 'Image Search',
@@ -103,7 +153,15 @@ export class ArchitectureComponent {
         'Sensitive to image quality, lighting, and obstructions.',
         'Difficult to combine directly with keyword search or precise attribute filters unless using advanced multi-modal models.',
         'Can be computationally expensive (embedding generation and search).'
-      ]
+       ],
+       sampleQuery: `WITH input_image_embedding AS (
+  SELECT embedding('multimodal_model', 'image_uri')::vector AS vector
+)
+SELECT product_name, product_image,
+       (image_embedding <=> vector) as visual_distance
+FROM products_table, input_image_embedding
+ORDER BY visual_distance ASC
+LIMIT 20;`
     }
   ];
 
@@ -118,4 +176,6 @@ export class ArchitectureComponent {
 
   // Get current date/time for display
   currentDateTime = new Date();
+
+  expandedElement: SearchMethodComparison | null = null;
 }

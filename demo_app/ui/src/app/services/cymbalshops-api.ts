@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, map } from 'rxjs';
+import { Observable, BehaviorSubject, map, lastValueFrom } from 'rxjs';
 import { BASE_URL } from '../app.config';
 
 // --- Interface for raw facet data from API ---
@@ -161,6 +161,13 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
         };
         const params = this.buildParams(baseParams);
         return this.http.get<ExplainQueryResponse<Product>>(`${this.baseUrl}/products/explain-query`, { params });
+    }
+    async visualizeProduct(roomImage: File, productImageUri: string): Promise<any> {
+        const formData = new FormData();
+        formData.append('roomImage', roomImage);
+        formData.append('productImage', productImageUri);
+
+        return lastValueFrom(this.http.post(`${this.baseUrl}/visualize`, formData));
     }
 }
 

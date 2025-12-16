@@ -7,7 +7,7 @@
             <mat-radio-button value="{{searchTypes.FULLTEXT}}"><span class=radio-text>Full-text Search</span></mat-radio-button>
             <mat-radio-button value="{{searchTypes.TEXT_EMBEDDINGS}}"><span class=radio-text>Vector Search</span></mat-radio-button>
             <mat-radio-button value="{{searchTypes.HYBRID}}"><span class=radio-text>Hybrid Search</span></mat-radio-button>
-            <mat-radio-button value="{{searchTypes.IMAGE}}"><span class=radio-text>Image Search</span></mat-radio-button>
+            <!-- <mat-radio-button value="{{searchTypes.IMAGE}}"><span class=radio-text>Image Search</span></mat-radio-button> -->
         </mat-radio-group>
 
         <div class="ai-filter-toggle-container">
@@ -18,16 +18,20 @@
     </div>
 
     <div class="search-inputs-container">
-        <mat-form-field [ngClass]="{'full-width-field': !aiFilterEnabled, 'half-width-field': aiFilterEnabled}"
-            floatLabel="always" class="product-search-field">
-            <mat-label>Product Search</mat-label>
-            <input matInput [(ngModel)]="productSearch" (keydown.enter)="findProducts()"
-                [placeholder]="searchType == 'image' ? SEARCH_PLACEHOLDER_IMAGE : (aiFilterEnabled ? 'Enter main search term or leave blank for AI filter only' : SEARCH_PLACEHOLDER)">
-            <mat-icon matTooltip="Sample suggestion" matSuffix fontSet="material-symbols-outlined"
-                (click)="productSearch = getSuggestion(); findProducts()">
-                prompt_suggestion
-            </mat-icon>
-        </mat-form-field>
+        <div class="search-input-wrapper"
+            [ngClass]="{'full-width-wrapper': !aiFilterEnabled, 'half-width-wrapper': aiFilterEnabled}">
+            <mat-form-field floatLabel="always" class="product-search-field full-width-field">
+                <mat-label>Product Search</mat-label>
+                <input matInput [(ngModel)]="productSearch" (keydown.enter)="findProducts()"
+                    [placeholder]="searchType == 'image' ? SEARCH_PLACEHOLDER_IMAGE : (aiFilterEnabled ? 'Enter main search term or leave blank for AI filter only' : SEARCH_PLACEHOLDER)">
+            </mat-form-field>
+            <div class="suggestion-container" *ngIf="getSuggestion()">
+                <div class="suggestion-chip" (click)="productSearch = getSuggestion(); findProducts()">
+                    <mat-icon class="suggestion-icon">lightbulb</mat-icon>
+                    <span>Try example: <strong>{{ getSuggestion() }}</strong></span>
+                </div>
+            </div>
+            </div>
 
         <mat-form-field *ngIf="aiFilterEnabled" class="half-width-field ai-filter-input" floatLabel="always">
             <mat-label>Gemini Filter</mat-label>
@@ -36,20 +40,22 @@
         </mat-form-field>
     </div>
 
-    <app-image-selector *ngIf="searchType=='image'"
-        (imageSelected)="onImageSelectedFromChild($event)"></app-image-selector>
+    <!-- <app-image-selector *ngIf="searchType=='image'"
+                    (imageSelected)="onImageSelectedFromChild($event)"></app-image-selector> -->
     <mat-card-actions>
         <button mat-raised-button color="primary"
-            [disabled]="productSearch.length === 0 && (!aiFilterEnabled || aiFilterText.length === 0)"
+            [disabled]="productsLoading || (productSearch.length === 0 && (!aiFilterEnabled || aiFilterText.length === 0))"
             (click)="findProducts()">
-            {{BUTTON_TEXT}}
+            <span>{{ productsLoading ? LOADING_BUTTON_TEXT : BUTTON_TEXT }}</span>
         </button>
+        <span *ngIf="!productsLoading && searchDuration > 0" style="margin-left: 16px; color: gray; font-size: 0.9em;">
+            ({{ searchDuration | number:'1.2-3' }}s)
+        </span>
         <span class="show-sql-spacer"></span>
         <div class="show-sql">
-            <button mat-stroked-button color="secondary" style="margin-left: 8px;"
+            <button mat-raised-button color="primary" style="margin-left: 8px;"
                 *ngIf="productResultsComponent && (productResultsComponent.interpolatedQuery || productResultsComponent.query || productResultsComponent.facetInterpolatedQuery)"
                 (click)="productResultsComponent.openSqlDialog()">
-                <mat-icon fontSet="material-symbols-outlined">info</mat-icon>
                 View SQL Queries
             </button>
         </div>

@@ -4,7 +4,12 @@
             <mat-spinner [diameter]="50"></mat-spinner>
         </div>
         <div *ngIf="!facetsLoading && groupedFacets.length > 0">
-            <h3>Refine By</h3>
+            <div class="facets-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Refine By</h3>
+                <button mat-button color="warn" *ngIf="hasSelectedFacets()" (click)="clearSelectedFacets()" style="font-size: 0.8em;">
+                    Clear All
+                </button>
+                </div>
 
             <div *ngFor="let group of groupedFacets; let isLastGroup = last" class="facet-group">
                 <h4>{{ group.type }}</h4>
@@ -34,9 +39,9 @@
     </div>
 
     <div class="products-main-content">
-        <div *ngIf="productsLoading && aiFilterEnabled" class="spinner-container main-results-spinner">
+        <div *ngIf="productsLoading" class="spinner-container main-results-spinner">
             <mat-spinner [diameter]="50"></mat-spinner>
-            &nbsp;&nbsp;Gemini is evaluating the first page of results...
+            <span *ngIf="aiFilterEnabled">&nbsp;&nbsp;Gemini is evaluating the first page of results...</span>
         </div>
 
         <ng-container *ngIf="!productsLoading">
@@ -66,7 +71,7 @@
                         <mat-card-subtitle>
                             <span class="price">{{product.retailPrice}}</span>
                             <span class="productSubtitle">{{product.name}}</span>
-                            <span class="productDetail">&nbsp; {{product.productDescription}}</span>
+                            <span class="productDetail" [innerHTML]="product.productDescription | textToHtml"></span>
                         </mat-card-subtitle>
 
                         <span class="productDetailExtended">
@@ -76,9 +81,17 @@
                             <br>SKU: {{product.sku}}
                             <br><br><br><br>
                         </span>
-                        <span class="retrievalMethod">{{product.retrievalMethod}}</span>
-                        @if(product.rrfScore != null) { <span class="score">Score: {{product.rrfScore}}</span>
-                        }
+                        <div class="card-footer">
+                            <div class="visualize-button-container">
+                                <button mat-raised-button color="primary" (click)="openVisualizeDialog(product)" class="visualize-btn">
+                                    <mat-icon>add_a_photo</mat-icon> Visualize in Room
+                                </button>
+                            </div>
+                            <div class="meta-info">
+                                <span class="retrievalMethod">{{product.retrievalMethod}}</span>
+                                @if(product.rrfScore != null) { <span class="score">Score: {{product.rrfScore}}</span> }
+                                </div>
+                                </div>
                     </mat-card>
                 </div>
                 } @else {
@@ -99,3 +112,39 @@
 
     </div>
 </div>
+<style>
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: auto;
+        /* Push to bottom if flex column */
+        padding-top: 16px;
+    }
+
+    .visualize-btn {
+        font-weight: 500;
+        background-color: white !important;
+        /* Force white background for contrast */
+        color: #333 !important;
+        /* Dark text */
+    }
+
+    .meta-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        font-size: 0.8em;
+        color: #ccc;
+        /* Lighter text for dark background */
+    }
+
+    /* Override existing absolute positioning if any */
+    .retrievalMethod,
+    .score {
+        position: static !important;
+        /* Reset absolute positioning */
+        display: block;
+        margin-top: 4px;
+    }
+</style>
