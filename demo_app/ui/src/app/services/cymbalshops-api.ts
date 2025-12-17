@@ -78,6 +78,8 @@ export interface CymbalShopsService {
     hybridSearchProducts(term: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>>;
     imageSearchProducts(searchUri: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>>;
     getFacets(term: string, searchType: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<FacetResponse>;
+    getConfig(): Observable<any>;
+    runBigQuery(query: string): Observable<any[]>;
 }
 
 @Injectable({
@@ -85,6 +87,14 @@ export interface CymbalShopsService {
 })
 export class CymbalShopsServiceClient implements CymbalShopsService {
     constructor(private http: HttpClient, @Inject(BASE_URL) private baseUrl: string) {}
+
+    getConfig(): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}/config`);
+    }
+
+    runBigQuery(query: string): Observable<any[]> {
+        return this.http.post<any[]>(`${this.baseUrl}/bigquery/query`, { query });
+    }
 
     // Helper to build parameters including optional facets
     private buildParams(

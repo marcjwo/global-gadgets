@@ -48,6 +48,14 @@ app.post('/api/bigquery/query', async (req: express.Request, res: express.Respon
   }
 });
 
+app.get('/api/config', (req: express.Request, res: express.Response) => {
+  res.json({
+    bigqueryProjectId: process.env.BIGQUERY_PROJECT_ID || 'bigquery-public-data',
+    bigqueryDatasetId: process.env.BIGQUERY_DATASET_ID || 'cypmpbal_sports',
+    bigqueryLocation: process.env.BIGQUERY_LOCATION || 'US'
+  });
+});
+
 
 
 

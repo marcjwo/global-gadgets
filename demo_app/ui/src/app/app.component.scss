@@ -121,8 +121,8 @@ nav[mat-tab-nav-bar] {
 
 .main-content {
   flex: 1 1 auto;
-  overflow: hidden;
-  /* Scroll handled by children */
+  overflow-y: auto; // Allow content to scroll vertically
+    overflow-x: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
