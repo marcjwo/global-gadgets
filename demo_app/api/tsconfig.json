@@ -4,8 +4,16 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "strict": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "lib": [
+      "es2022",
+      "dom"
+    ]
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "_test_node",
+    "_test_node"
+  ]
 }

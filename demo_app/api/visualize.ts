@@ -1,7 +1,6 @@
 import express from 'express';
 import multer from 'multer';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fetch from 'node-fetch';
 
 const visualizeRouter = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -121,11 +120,11 @@ visualizeRouter.post('/', upload.single('roomImage'), async (req, res) => {
     const parts = candidate.content.parts;
 
     // Find the image part
-    const imagePart = parts.find(part => part.inlineData);
+    const imagePart = parts.find((part: any) => part.inlineData);
 
     if (!imagePart || !imagePart.inlineData) {
       // Fallback: Check if it returned text saying it can't do it
-      const textPart = parts.find(part => part.text);
+      const textPart = parts.find((part: any) => part.text);
       if (textPart) {
         console.warn('Gemini returned text instead of image:', textPart.text);
         return res.status(422).json({ error: 'Model returned text instead of image. It might have refused the request.', details: textPart.text });

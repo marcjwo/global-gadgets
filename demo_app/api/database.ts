@@ -1,4 +1,4 @@
-import { Pool, QueryResult } from 'pg'
+import { Pool, QueryResult } from 'pg';
 import * as _ from 'lodash';
 
 /**

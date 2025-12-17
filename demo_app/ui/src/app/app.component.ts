@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
   navLinks = [
     { path: '/products', label: 'Product Search' },
     { path: '/insights', label: 'Operational and Analytical Insights' },
-    { path: '/agent-lounge', label: 'Agent Lounge 🩻' }
+    { path: '/bigquery', label: 'BigQuery AI' }
   ];
 
   markdownContent = '';

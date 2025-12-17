@@ -27,6 +27,31 @@ app.use(express.static(staticPath));
 app.use('/api/visualize', visualizeRouter);
 
 //
+// BigQuery Routes
+//
+import { BigQueryService } from './bigquery';
+const bqService = new BigQueryService();
+
+app.post('/api/bigquery/query', async (req: express.Request, res: express.Response) => {
+  try {
+    const query = req.body.query;
+    if (!query) {
+      return res.status(400).send('Missing "query" in request body.');
+    }
+    // Simple pass-through for demo purposes. 
+    // In production, validate/sanitize input or use parameterized queries if possible.
+    const rows = await bqService.query(query);
+    res.json(rows);
+  } catch (err: any) {
+    console.error('Error in BigQuery route:', err);
+    res.status(500).send(err.message || err);
+  }
+});
+
+
+
+
+//
 // Helper to parse facets and AI filter text
 //
 const parseSearchParams = (req: express.Request): { term: string, selectedFacets: SelectedFacets, aiFilterText?: string, searchUri?: string, prompt?: string } => {
