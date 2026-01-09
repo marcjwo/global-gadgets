@@ -11,9 +11,9 @@ import { CymbalShopsServiceClient } from '../../services/cymbalshops-api';
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   template: `
-    <h2 mat-dialog-title>Visualize in Your Room (Powered by Nano Banana 🍌)</h2>
+    <h2 mat-dialog-title>Visualize on Your Desk (Powered by Nano Banana 🍌)</h2>
     <div mat-dialog-content class="dialog-content">
-      <p>Upload a photo of your room to see this product placed in it.</p>
+      <p>Upload a photo of your desk to see this product placed on it.</p>
       
       <div class="upload-section" *ngIf="!generatedImage">
         <div class="preview-container">
@@ -22,7 +22,7 @@ import { CymbalShopsServiceClient } from '../../services/cymbalshops-api';
                 <img [src]="data.product.productImageUri" class="preview-image">
             </div>
             <div class="image-wrapper">
-                <p>Your Room</p>
+                <p>Your Desk</p>
                 <div *ngIf="!roomImagePreview" class="placeholder-image" (click)="fileInput.click()">
                     <mat-icon>add_a_photo</mat-icon>
                     <span>Upload</span>
