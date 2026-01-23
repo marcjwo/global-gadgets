@@ -23,9 +23,9 @@ This project provides resources to set up and explore AlloyDB AI and other Googl
 Key files and descriptions are provided below.
 
 ```
-cymbal-shops-alloydb/
+global-gadgets-alloydb/
 │
-├── cymbal_shops_hybrid_search_alloydb_data_prep.ipynb  # Full data prep notebook (embeddings, FTS, etc.)
+├── global_gadgets_hybrid_search_alloydb_data_prep.ipynb  # Full data prep notebook (embeddings, FTS, etc.)
 │
 ├── demo_app/                                           # Demo Application
 │   ├── api/                                            # Node.js/Express backend API
