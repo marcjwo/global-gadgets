@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CymbalShopsServiceClient } from '../../services/cymbalshops-api';
+import { GlobalGadgetsServiceClient } from '../../services/globalgadgets-api';
 
 @Component({
   selector: 'app-visualize-dialog',
@@ -147,7 +147,7 @@ export class VisualizeDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<VisualizeDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { product: any },
-    private cymbalShopsService: CymbalShopsServiceClient
+    private cymbalShopsService: GlobalGadgetsServiceClient
   ) { }
 
   onFileSelected(event: any) {

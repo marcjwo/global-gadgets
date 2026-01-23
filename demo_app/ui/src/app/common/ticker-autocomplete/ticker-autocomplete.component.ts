@@ -5,7 +5,7 @@ import {AsyncPipe} from '@angular/common';
 import {MatSelectModule} from '@angular/material/select';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {CymbalShopsServiceClient} from '../../services/cymbalshops-api';
+import { GlobalGadgetsServiceClient } from '../../services/globalgadgets-api';
 import { SnackBarErrorComponent } from '../SnackBarErrorComponent';
 
 /**
@@ -31,7 +31,7 @@ export class TickerAutocompleteComponent {
   tickers?: Observable<string[]>;
 
   constructor(
-      private CymbalShopsClient: CymbalShopsServiceClient, 
+    private CymbalShopsClient: GlobalGadgetsServiceClient, 
       private error: SnackBarErrorComponent) {
     this.tickers = this.CymbalShopsClient.getTickers().pipe(
       // sort tickers alphabetically

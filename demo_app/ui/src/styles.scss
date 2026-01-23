@@ -6,6 +6,7 @@ body {
   height: 100%;
   margin: 0;
   box-sizing: border-box;
+  font-family: "Google Sans", Roboto, "Helvetica Neue", sans-serif;
 }
 // Ensure core styles are included once
 @include mat.core();

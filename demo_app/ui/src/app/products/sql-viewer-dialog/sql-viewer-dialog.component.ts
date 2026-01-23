@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
 import { SqlStatementComponent } from '../../common/sql-statement/sql-statement.component';
-import { CymbalShopsServiceClient, ExplainQueryResponse } from '../../services/cymbalshops-api'; // Adjust path as needed
+import { GlobalGadgetsServiceClient, ExplainQueryResponse } from '../../services/globalgadgets-api'; // Adjust path as needed
 import { SnackBarErrorComponent } from '../../common/SnackBarErrorComponent'; // Adjust path
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
@@ -47,7 +47,7 @@ export class SqlViewerDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<SqlViewerDialogComponent>, // Keep MatDialogRef if you need to close programmatically
     @Inject(MAT_DIALOG_DATA) public data: SqlDialogData,
-    private cymbalShopsClient: CymbalShopsServiceClient, // Inject the service
+    private cymbalShopsClient: GlobalGadgetsServiceClient, // Inject the service
     private errorSnackbar: SnackBarErrorComponent // Inject error handler
   ) {}
 

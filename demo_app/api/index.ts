@@ -15,7 +15,7 @@ const upload = multer();
 const db: Database = new Database();
 const dbPsv: DatabasePsv = new DatabasePsv();
 const products = new Products(db, dbPsv);
-const staticPath = join(__dirname, 'ui/dist/cymbal-shops-ui/browser');
+const staticPath = join(__dirname, 'ui/dist/global-gadgets-ui/browser');
 
 //
 // Use middleware
@@ -44,6 +44,21 @@ app.post('/api/bigquery/query', async (req: express.Request, res: express.Respon
     res.json(rows);
   } catch (err: any) {
     console.error('Error in BigQuery route:', err);
+    res.status(500).send(err.message || err);
+  }
+});
+
+app.post('/api/alloydb/query', async (req: express.Request, res: express.Response) => {
+  try {
+    const query = req.body.query;
+    if (!query) {
+      return res.status(400).send('Missing "query" in request body.');
+    }
+    // Execute query using the existing db instance
+    const rows = await db.query(query);
+    res.json(rows);
+  } catch (err: any) {
+    console.error('Error in AlloyDB route:', err);
     res.status(500).send(err.message || err);
   }
 });
@@ -219,5 +234,5 @@ app.get('*', (req, res) => {
 const port: number = parseInt(process.env.PORT ?? '8080');
 
 app.listen(port, () => {
-  console.log(`Cymbal Shops API: listening on port ${port}`);
+  console.log(`Global Gadgets API: listening on port ${port}`);
 });

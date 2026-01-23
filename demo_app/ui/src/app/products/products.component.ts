@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit, ApplicationRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CymbalShopsServiceClient, Product, QueryResponse, FacetResponse, RawFacet, ExplainQueryResponse } from '../services/cymbalshops-api';
+import { GlobalGadgetsServiceClient, Product, QueryResponse, FacetResponse, RawFacet, ExplainQueryResponse } from '../services/globalgadgets-api';
 import { Observable, catchError, finalize, forkJoin, map, of, tap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -15,7 +15,7 @@ import { ProductResultsComponent } from './results/product-results.component';
 import { SqlViewerDialogComponent } from './sql-viewer-dialog/sql-viewer-dialog.component';
 import { SnackBarErrorComponent } from '../common/SnackBarErrorComponent';
 import { ActivatedRoute } from '@angular/router';
-import { RoleService } from '../services/cymbalshops-api';
+import { RoleService } from '../services/globalgadgets-api';
 import { ImageSelectorComponent } from '../common/image-selector/image-selector.component';
 
 
@@ -85,7 +85,7 @@ export class ProductsComponent implements OnInit {
   LOADING_BUTTON_TEXT = "Searching";
 
   constructor(
-    private CymbalShopsClient: CymbalShopsServiceClient,
+    private CymbalShopsClient: GlobalGadgetsServiceClient,
     private error: SnackBarErrorComponent,
     private RoleService: RoleService,
     private ApplicationRef: ApplicationRef,

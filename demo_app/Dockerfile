@@ -32,7 +32,7 @@ COPY --from=api-build /dist .
 COPY --from=api-build /src/node_modules ./node_modules
 
 # Copy build artifacts from the ui-build stage
-COPY --from=ui-build /dist ./ui/dist/cymbal-shops-ui
+COPY --from=ui-build /dist ./ui/dist/global-gadgets-ui
 
 EXPOSE 8080
 

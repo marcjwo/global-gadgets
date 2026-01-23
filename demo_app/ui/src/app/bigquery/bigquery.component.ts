@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CymbalShopsServiceClient } from '../services/cymbalshops-api';
+import { GlobalGadgetsServiceClient } from '../services/globalgadgets-api';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -48,7 +48,7 @@ export class BigQueryComponent implements OnInit {
   displayedColumns: string[] = [];
 
   constructor(
-    private cymbalShopsService: CymbalShopsServiceClient,
+    private cymbalShopsService: GlobalGadgetsServiceClient,
     private clipboard: Clipboard,
     private snackBar: MatSnackBar
   ) { }

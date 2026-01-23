@@ -25,7 +25,7 @@ export interface FacetGroup {
 export interface FacetResponse {
     query?: string;
     data?: RawFacet[];
-    totalCount?: number; 
+    totalCount?: number;
     errorDetail?: string;
 }
 
@@ -71,7 +71,7 @@ export interface Product {
     distance?: number;
 }
 
-export interface CymbalShopsService {
+export interface GlobalGadgetsService {
     searchProducts(term: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>>;
     fulltextSearchProducts(term: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>>;
     semanticSearchProducts(prompt: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>>;
@@ -80,13 +80,15 @@ export interface CymbalShopsService {
     getFacets(term: string, searchType: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<FacetResponse>;
     getConfig(): Observable<any>;
     runBigQuery(query: string): Observable<any[]>;
+    runAlloyDBQuery(query: string): Observable<any[]>;
+    getTickers(): Observable<string[]>;
 }
 
 @Injectable({
     providedIn: 'root'
 })
-export class CymbalShopsServiceClient implements CymbalShopsService {
-    constructor(private http: HttpClient, @Inject(BASE_URL) private baseUrl: string) {}
+export class GlobalGadgetsServiceClient implements GlobalGadgetsService {
+    constructor(private http: HttpClient, @Inject(BASE_URL) private baseUrl: string) { }
 
     getConfig(): Observable<any> {
         return this.http.get<any>(`${this.baseUrl}/config`);
@@ -96,9 +98,17 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
         return this.http.post<any[]>(`${this.baseUrl}/bigquery/query`, { query });
     }
 
+    runAlloyDBQuery(query: string): Observable<any[]> {
+        return this.http.post<any[]>(`${this.baseUrl}/alloydb/query`, { query });
+    }
+
+    getTickers(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.baseUrl}/products/tickers`);
+    }
+
     // Helper to build parameters including optional facets
     private buildParams(
-        baseParams: { [param: string]: string | number | boolean }, 
+        baseParams: { [param: string]: string | number | boolean },
         facets?: { [key: string]: string[] },
         aiFilterText?: string
     ): HttpParams {
@@ -123,7 +133,7 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
     }
 
     fulltextSearchProducts(term: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>> {
-         const baseParams = {
+        const baseParams = {
             term: term
         };
         //console.log(`Facets in UI: ${JSON.stringify(facets)}`)
@@ -132,7 +142,7 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
     }
 
     semanticSearchProducts(prompt: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>> {
-         const baseParams = {
+        const baseParams = {
             prompt: prompt
         };
         const params = this.buildParams(baseParams, facets, aiFilterText);
@@ -140,7 +150,7 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
     }
 
     hybridSearchProducts(term: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>> {
-         const baseParams = {
+        const baseParams = {
             term: term
         };
         const params = this.buildParams(baseParams, facets, aiFilterText);
@@ -149,13 +159,13 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
 
     imageSearchProducts(searchUri: string, facets?: { [key: string]: string[] }, aiFilterText?: string): Observable<QueryResponse<Product>> {
         const baseParams = {
-           searchUri: searchUri
-       };
-       const params = this.buildParams(baseParams, facets, aiFilterText); // Use helper to add facets
-       return this.http.get<QueryResponse<Product>>(`${this.baseUrl}/products/image-search`, { params });
-   }
+            searchUri: searchUri
+        };
+        const params = this.buildParams(baseParams, facets, aiFilterText); // Use helper to add facets
+        return this.http.get<QueryResponse<Product>>(`${this.baseUrl}/products/image-search`, { params });
+    }
 
-   getFacets(term: string, searchType: string = 'hybrid', facets?: { [key: string]: string[] }): Observable<FacetResponse> {
+    getFacets(term: string, searchType: string = 'hybrid', facets?: { [key: string]: string[] }): Observable<FacetResponse> {
         const baseParams: { [param: string]: string } = {
             term: term,
             searchType: searchType // Include searchType for context
@@ -185,32 +195,32 @@ export class CymbalShopsServiceClient implements CymbalShopsService {
     providedIn: 'root'
 })
 export class RoleService {
-  private roleChangeSource = new BehaviorSubject<Map<string, Array<number | null>> 
- | undefined>(undefined);
-  role$ = this.roleChangeSource.asObservable(); 
+    private roleChangeSource = new BehaviorSubject<Map<string, Array<number | null>>
+        | undefined>(undefined);
+    role$ = this.roleChangeSource.asObservable();
 
-  updateRole(newRole: Map<string, Array<number | null>> | undefined) {
-    this.roleChangeSource.next(newRole);
-  }
-
-  lookupRoleDetails(role: string): Map<string, Array<number | null>> | undefined {
-    // Array should be formed as follows:
-    // ["Role (Name)", [role_id, subscription_id]]
-    const roleMap: Map<string, Array<number | null>> = new Map([
-      ["Shopper (Paul Ramsey)", [1, 2]],
-      ["Shopper (Evelyn Sterling)", [2, 2]],
-      ["Shopper (Arthur Kensington)", [3, 2]],
-      ["Shopper (Penelope Wainwright)", [4, 2]],
-      ["Shopper (Sebastian Thorne)", [5, 2]],
-      ["Admin", [0, 2]]
-    ]);
-  
-    const id = roleMap.get(role);
-  
-    if (id !== undefined) {
-      return new Map([[role, id]]); // Create a new Map with the role and its ID
-    } else {
-      return undefined;
+    updateRole(newRole: Map<string, Array<number | null>> | undefined) {
+        this.roleChangeSource.next(newRole);
     }
-  }
+
+    lookupRoleDetails(role: string): Map<string, Array<number | null>> | undefined {
+        // Array should be formed as follows:
+        // ["Role (Name)", [role_id, subscription_id]]
+        const roleMap: Map<string, Array<number | null>> = new Map([
+            ["Shopper (Paul Ramsey)", [1, 2]],
+            ["Shopper (Evelyn Sterling)", [2, 2]],
+            ["Shopper (Arthur Kensington)", [3, 2]],
+            ["Shopper (Penelope Wainwright)", [4, 2]],
+            ["Shopper (Sebastian Thorne)", [5, 2]],
+            ["Admin", [0, 2]]
+        ]);
+
+        const id = roleMap.get(role);
+
+        if (id !== undefined) {
+            return new Map([[role, id]]); // Create a new Map with the role and its ID
+        } else {
+            return undefined;
+        }
+    }
 }

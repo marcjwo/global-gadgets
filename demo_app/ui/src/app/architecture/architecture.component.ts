@@ -138,31 +138,31 @@ LEFT JOIN vector_results v ON p.id = v.id
 LEFT JOIN keyword_results k ON p.id = k.id
 ORDER BY rrf_score DESC;`
     },
-     {
-      methodName: 'Image Search',
-      strengths: [
-        'Enables search based on visual similarity ("shop the look", finding alternatives).',
-        'Doesn\'t rely on text descriptions; useful for products with poor or missing text data.',
-        'Allows users to search using an uploaded image.',
-        'Can identify products even with variations in angle or background (depending on model robustness).',
-        'Can potentially be combined with text using multi-modal models.'
-      ],
-      weaknesses: [
-        'Relevance is purely visual; may not match user\'s functional need or textual query intent.',
-        'Requires image embedding generation, storage, and vector search infrastructure.',
-        'Sensitive to image quality, lighting, and obstructions.',
-        'Difficult to combine directly with keyword search or precise attribute filters unless using advanced multi-modal models.',
-        'Can be computationally expensive (embedding generation and search).'
-       ],
-       sampleQuery: `WITH input_image_embedding AS (
-  SELECT embedding('multimodal_model', 'image_uri')::vector AS vector
-)
-SELECT product_name, product_image,
-       (image_embedding <=> vector) as visual_distance
-FROM products_table, input_image_embedding
-ORDER BY visual_distance ASC
-LIMIT 20;`
-    }
+    //      {
+    //       methodName: 'Image Search',
+    //       strengths: [
+    //         'Enables search based on visual similarity ("shop the look", finding alternatives).',
+    //         'Doesn\'t rely on text descriptions; useful for products with poor or missing text data.',
+    //         'Allows users to search using an uploaded image.',
+    //         'Can identify products even with variations in angle or background (depending on model robustness).',
+    //         'Can potentially be combined with text using multi-modal models.'
+    //       ],
+    //       weaknesses: [
+    //         'Relevance is purely visual; may not match user\'s functional need or textual query intent.',
+    //         'Requires image embedding generation, storage, and vector search infrastructure.',
+    //         'Sensitive to image quality, lighting, and obstructions.',
+    //         'Difficult to combine directly with keyword search or precise attribute filters unless using advanced multi-modal models.',
+    //         'Can be computationally expensive (embedding generation and search).'
+    //        ],
+    //        sampleQuery: `WITH input_image_embedding AS (
+    //   SELECT embedding('multimodal_model', 'image_uri')::vector AS vector
+    // )
+    // SELECT product_name, product_image,
+    //        (image_embedding <=> vector) as visual_distance
+    // FROM products_table, input_image_embedding
+    // ORDER BY visual_distance ASC
+    // LIMIT 20;`
+    //     }
   ];
 
   // Columns to display in the table, matching matColumnDef names

@@ -1,12 +1,12 @@
-# Cymbal Shops Demo Application (API & UI)
+# Global Gadgets Demo Application (API & UI)
 
-This directory contains the source code for the Cymbal Shops demo application, which includes:
+This directory contains the source code for the Global Gadgets demo application, which includes:
 
 1.  **Backend API**: A Node.js/Express application (`api/`) that provides REST endpoints (`/api/*`) to interact with the AlloyDB database.
 2.  **Frontend UI**: An Angular application (`ui/`) providing the user interface for searching products.
 3.  **Deployment Scripts**: Helper scripts (`env.sh`, `install.sh`, `deployment/`) to deploy the application to Google Cloud Run or run locally.
 
-**Note:** This application requires the AlloyDB database to be set up first using one of the notebooks in the parent directory (`../cymbal_shops_stylesearch_demo_shortcut.ipynb` or `../cymbal_shops_hybrid_search_alloydb_data_prep.ipynb`). If you are using Public IP to connect to AlloyDB, ensure your source public IP is allowed as an [Authorized Network](https://cloud.google.com/alloydb/docs/connect-public-ip) in AlloyDB.
+**Note:** This application requires the AlloyDB database to be set up first using one of the notebooks in the parent directory (`../cymbal_shops_stylesearch_demo_shortcut.ipynb` or `../global_gadgets_hybrid_search_alloydb_data_prep.ipynb`). If you are using Public IP to connect to AlloyDB, ensure your source public IP is allowed as an [Authorized Network](https://cloud.google.com/alloydb/docs/connect-public-ip) in AlloyDB.
 
 ## Architecture
 
@@ -37,7 +37,7 @@ These steps build the combined API/UI container image, push it to Artifact Regis
 1.  **Clone Repo and Navigate to demo_app Directory:**
     ```bash
     git clone https://github.com/paulramsey/stylesearch-alloydb-ai-demo.git
-    cd cymbal-shops-alloydb-ai-demo/demo_app
+    cd global-gadgets-alloydb-ai-demo/demo_app
     ```
 
 2.  **Authenticate to Google Cloud:**
@@ -60,14 +60,14 @@ These steps build the combined API/UI container image, push it to Artifact Regis
 
 4.  **Run the Deployment Script:**
     The `install.sh` script orchestrates the deployment process:
-    * `deployment/deploy-registry.sh`: Creates an Artifact Registry repository named `cymbalshops` if it doesn't exist.
-    * `deployment/deploy-frontend.sh`: Builds the Docker image, tags it based on the latest git tag, pushes it to Artifact Registry, and deploys the image to a Cloud Run service named `cymbalshops`. It configures the service with network settings and injects AlloyDB connection details as environment variables.
+    * `deployment/deploy-registry.sh`: Creates an Artifact Registry repository named `globalgadgets` if it doesn't exist.
+    * `deployment/deploy-frontend.sh`: Builds the Docker image, tags it based on the latest git tag, pushes it to Artifact Registry, and deploys the image to a Cloud Run service named `globalgadgets`. It configures the service with network settings and injects AlloyDB connection details as environment variables.
         ```bash
         source ./install.sh
         ```
 
 5.  **Access the Application:**
-    After deployment, `gcloud` will output the URL for the deployed Cloud Run service. You can access the Cymbal Shops application using this URL.
+    After deployment, `gcloud` will output the URL for the deployed Cloud Run service. You can access the Global Gadgets application using this URL.
 
 ## Local Development Setup
 

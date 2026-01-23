@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "cymbal-shops-ui": {
+    "global-gadgets-ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/cymbal-shops-ui",
+            "outputPath": "dist/global-gadgets-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "cymbal-shops-ui:build:production"
+              "buildTarget": "global-gadgets-ui:build:production"
             },
             "development": {
-              "buildTarget": "cymbal-shops-ui:build:development"
+              "buildTarget": "global-gadgets-ui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "cymbal-shops-ui:build"
+            "buildTarget": "global-gadgets-ui:build"
           }
         },
         "test": {

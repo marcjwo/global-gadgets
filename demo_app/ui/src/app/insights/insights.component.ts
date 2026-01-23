@@ -18,7 +18,7 @@ export class InsightsComponent implements OnInit {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
-    const url = 'https://looker.cloud-bi-opm.com/embed/dashboards/314?tab_name=AlloyDB';
+    const url = 'https://looker.cloud-bi-opm.com/embed/dashboards/314?allow_login_screen=true';
     this.dashboardUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }

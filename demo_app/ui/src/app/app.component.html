@@ -36,6 +36,9 @@
         <button mat-button (click)="openKudosDialog()">
             <span class="architecture">Kudos</span>
         </button>
+        <button mat-button (click)="openWalkthroughDialog()">
+            <span class="architecture">User Guide</span>
+        </button>
     </mat-toolbar>
     <nav mat-tab-nav-bar [tabPanel]="tabPanel">
         @for (link of navLinks; track link) {

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QueryResponse, Product, FacetResponse, RawFacet, FacetGroup, Facet } from '../../services/cymbalshops-api';
+import { QueryResponse, Product, FacetResponse, RawFacet, FacetGroup, Facet } from '../../services/globalgadgets-api';
 import { Observable, Subscription, map } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -17,7 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TextToHtmlPipe } from '../../common/text-to-html.pipe';
 import { SqlStatementComponent } from '../../common/sql-statement/sql-statement.component';
 import { SqlViewerDialogComponent } from '../sql-viewer-dialog/sql-viewer-dialog.component';
-import { RoleService } from '../../services/cymbalshops-api';
+import { RoleService } from '../../services/globalgadgets-api';
 import { VisualizeDialogComponent } from '../visualize/visualize-dialog.component';
 
 @Component({

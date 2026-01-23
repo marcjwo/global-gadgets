@@ -18,7 +18,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
 import { MatMenuModule } from '@angular/material/menu';
 
-import { RoleService } from './services/cymbalshops-api';
+import { RoleService } from './services/globalgadgets-api';
 
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MarkdownViewerComponent } from './common/markdown-viewer/markdown-viewer.component';
@@ -26,6 +26,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { ArchitectureComponent } from './architecture/architecture.component';
 import { KudosComponent } from './kudos/kudos.component';
+
+import { WalkthroughDialogComponent } from './walkthrough-dialog/walkthrough-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +48,8 @@ import { KudosComponent } from './kudos/kudos.component';
     MarkdownViewerComponent,
     MarkdownViewerComponent,
     ArchitectureComponent,
-    KudosComponent
+    KudosComponent,
+    WalkthroughDialogComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -64,7 +67,8 @@ export class AppComponent implements OnInit {
   navLinks = [
     { path: '/products', label: 'Product Search' },
     { path: '/insights', label: 'Operational and Analytical Insights' },
-    { path: '/bigquery', label: 'BigQuery AI' }
+    // { path: '/bigquery', label: 'BigQuery AI' },
+    { path: '/alloydb', label: 'AlloyDB AI' }
   ];
 
   markdownContent = '';
@@ -85,6 +89,13 @@ export class AppComponent implements OnInit {
   openKudosDialog() {
     this.dialog.open(KudosComponent, {
       width: '400px'
+    });
+  }
+
+  openWalkthroughDialog() {
+    this.dialog.open(WalkthroughDialogComponent, {
+      width: '600px',
+      autoFocus: false
     });
   }
 
